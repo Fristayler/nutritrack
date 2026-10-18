@@ -1195,5 +1195,82 @@
             saveStateToStorage(); renderAll(); closeAiScannerModal(); showToast('Блюдо добавлено!');
         }
     </script>
+<script>
+  // 1. Убираем кнопки и разделы установки приложения
+  window.addEventListener('DOMContentLoaded', () => {
+    // Ищем элементы с упоминанием установки или кнопку установки вверху/внизу
+    const installElements = document.querySelectorAll('button, a, div');
+    installElements.forEach(el => {
+      const text = el.textContent.toLowerCase();
+      if (text.includes('установ') || text.includes('📱') || text.includes('главный экран')) {
+        // Убираем только если это кнопка или элемент навигации, а не весь сайт
+        if (el.tagName === 'BUTTON' || el.classList.contains('nav-item') || el.id.includes('install')) {
+          el.remove();
+        }
+      }
+    });
+
+    // 2. Добавляем блок «Что я ел вчера» в интерфейс
+    const mainContainer = document.querySelector('main') || document.body;
+    
+    const yesterdaySection = document.createElement('div');
+    yesterdaySection.className = 'card mt-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100';
+    yesterdaySection.innerHTML = `
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-bold text-gray-800">📅 Что я ел вчера</h3>
+        <span id="yesterday-total-calories" class="text-sm font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">0 ккал</span>
+      </div>
+      <p class="text-xs text-gray-500 mb-3">Архив приемов пищи за прошлый день для контроля динамики.</p>
+      <div id="yesterday-meals-list" class="space-y-2 mb-3">
+        <p class="text-sm text-gray-400 italic">Здесь пока нет данных за вчерашний день.</p>
+      </div>
+      <button id="copy-yesterday-btn" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition">
+        📋 Повторить вчерашний рацион на сегодня
+      </button>
+    `;
+    
+    // Вставляем блок перед блоком продуктов или в конец главного контейнера
+    mainContainer.appendChild(yesterdaySection);
+
+    // Логика сохранения/загрузки «Вчерашнего дня» в localStorage
+    const yestList = document.getElementById('yesterday-meals-list');
+    const yestCal = document.getElementById('yesterday-total-calories');
+    const copyBtn = document.getElementById('copy-yesterday-btn');
+
+    // Загружаем данные вчерашнего дня при старте
+    const savedYesterday = JSON.parse(localStorage.getItem('nutritrack_yesterday')) || { meals: [], totalKcal: 0 };
+    
+    function renderYesterday() {
+      if (savedYesterday.meals.length === 0) {
+        yestList.innerHTML = `<p class="text-sm text-gray-400 italic">Вчерашний рацион пуст. Вы можете зафиксировать его кнопкой ниже (или данные появятся автоматически при смене суток).</p>`;
+        yestCal.textContent = `0 ккал`;
+        return;
+      }
+      yestList.innerHTML = savedYesterday.meals.map(m => `
+        <div class="flex justify-between items-center text-sm bg-gray-50 p-2 rounded-lg">
+          <span class="font-medium text-gray-700">${m.name}</span>
+          <span class="text-gray-500">${m.weight}г — <strong class="text-indigo-600">${m.kcal} ккал</strong></span>
+        </div>
+      `).join('');
+      yestCal.textContent = `${Math.round(savedYesterday.totalKcal)} ккал`;
+    }
+    renderYesterday();
+
+    // Кнопка переноса вчерашнего рациона на сегодня
+    copyBtn.addEventListener('click', () => {
+      if (savedYesterday.meals.length === 0) {
+        alert('Вчерашний рацион пуст!');
+        return;
+      }
+      // Достаем текущие сегодняшние блюда из калькулятора (если они там есть в памяти)
+      let currentMeals = JSON.parse(localStorage.getItem('nutritrack_current_meals')) || [];
+      currentMeals = currentMeals.concat(savedYesterday.meals);
+      localStorage.setItem('nutritrack_current_meals', JSON.stringify(currentMeals));
+      alert('Вчерашний рацион успешно добавлен в сегодняшний день!');
+      location.reload(); // Перезагружаем страницу, чтобы обновились круговые диаграммы
+    });
+  });
+</script>
+
 </body>
 </html>
