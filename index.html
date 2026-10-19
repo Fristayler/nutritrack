@@ -44,7 +44,7 @@
                         <span>NutriTrack</span>
                         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white rounded-full">PRO</span>
                     </h1>
-                    <p class="text-xs text-slate-500 hidden md:block">Калькулятор рациона, архив питания и ИИ-сканер</p>
+                    <p class="text-xs text-slate-500 hidden md:block">Калькулятор рациона, база Open Food Facts и ИИ-сканер</p>
                 </div>
             </div>
             
@@ -184,7 +184,7 @@
                         </div>
                         <div class="mt-3 flex items-center justify-between px-1 text-xs text-slate-500">
                             <span>Рекомендуемая норма воды:</span>
-                            <span class="font-semibold text-sky-600 flex items-center gap-1"><i class="ph-fill ph-drop"></i> <span id="calc-water">2.4</span> л / день</span>
+                            <span class="font-semibold text-sky-600 flex items-center gap-1"><i class="ph-fill ph-drop"></i> <span id="calc-water">2.5</span> л / день</span>
                         </div>
                     </div>
                 </section>
@@ -219,7 +219,7 @@
                         </div>
                         <div id="status-pill" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span>В процессе</span>
+                            <span>Активный день</span>
                         </div>
                     </div>
 
@@ -366,14 +366,14 @@
                                 <div class="sm:col-span-7 relative" id="search-container">
                                     <div class="relative">
                                         <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base"></i>
-                                        <input type="text" id="food-search-input" placeholder="Нажмите для выбора или поиска..." autocomplete="off"
+                                        <input type="text" id="food-search-input" placeholder="Поиск (локально + Open Food Facts)..." autocomplete="off"
                                             onfocus="window.showFoodDropdown()" oninput="window.filterFoodDropdown()"
                                             class="w-full bg-white border border-slate-200 focus:border-emerald-500 rounded-xl pl-10 pr-8 py-2.5 text-sm text-slate-800 outline-none">
                                         <button type="button" id="clear-search-btn" onclick="window.clearSelectedFood()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
                                             <i class="ph-bold ph-x text-xs"></i>
                                         </button>
                                     </div>
-                                    <div id="food-dropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white rounded-xl shadow-xl border border-slate-200 max-h-64 overflow-y-auto z-30 divide-y divide-slate-100"></div>
+                                    <div id="food-dropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white rounded-xl shadow-xl border border-slate-200 max-h-72 overflow-y-auto z-30 divide-y divide-slate-100"></div>
                                 </div>
 
                                 <div class="sm:col-span-3 flex flex-col">
@@ -461,7 +461,7 @@
         </div>
     </main>
 
-    <!-- Нижняя мобильная панель (4 рабочие кнопки, без установки) -->
+    <!-- Нижняя мобильная панель -->
     <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-1.5 flex items-center justify-around shadow-lg">
         <button type="button" onclick="window.scrollToSection('section-diary')" class="flex flex-col items-center gap-0.5 py-1 px-3 text-slate-600 active:text-emerald-600">
             <i class="ph-bold ph-chart-donut text-xl"></i>
@@ -497,7 +497,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-slate-900 text-base">ИИ-Сканер КБЖУ по фото</h3>
-                        <p class="text-xs text-slate-500">Распознавание блюда через Gemini Vision</p>
+                        <p class="text-xs text-slate-500">Модель: Gemini 3.5 Flash-Lite</p>
                     </div>
                 </div>
                 <button type="button" onclick="window.closeAiScannerModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl">
@@ -506,11 +506,11 @@
             </div>
 
             <div class="mt-4 space-y-4">
-                <!-- Настройка API ключа для работы на GitHub Pages -->
+                <!-- Настройка API ключа -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <div class="flex items-center justify-between mb-1">
-                        <label class="text-[11px] font-bold text-slate-600 uppercase">Ключ Gemini API (для работы вне чата)</label>
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-emerald-600 font-semibold underline">Получить бесплатно</a>
+                        <label class="text-[11px] font-bold text-slate-600 uppercase">Ключ Gemini API</label>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-emerald-600 font-semibold underline">Получить ключ</a>
                     </div>
                     <input type="password" id="gemini-api-key-input" placeholder="Вставьте ваш API-ключ (AIzaSy...)" oninput="window.saveApiKey(this.value)"
                         class="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs outline-none">
@@ -540,7 +540,7 @@
                 </div>
 
                 <div class="space-y-2.5">
-                    <input type="text" id="ai-user-hint" placeholder="Уточнение (например: котлеты из индейки с рисом, 300г)..."
+                    <input type="text" id="ai-user-hint" placeholder="Уточнение (например: котлетки из индейки с рисом, 300г)..."
                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm outline-none">
                     <button type="button" id="btn-run-ai-scan" onclick="window.analyzeFoodWithGemini()" disabled
                         class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm transition flex items-center justify-center gap-2">
@@ -650,32 +650,78 @@
     <script>
         const STORAGE_KEY = 'nutritrack_kbju_v2';
 
+        // Расширенная встроенная база продуктов (работает мгновенно и без интернета)
         const DEFAULT_FOODS = [
+            // Мясо, птица и яйца
             { id: 'f_kotl', name: 'Котлетки из индейки (с отрубями и яйцом)', category: 'Мясо и птица', cal: 138, p: 21.5, f: 3.8, c: 4.2 },
             { id: 'f_ind', name: 'Индейка филе грудки (готовое)', category: 'Мясо и птица', cal: 115, p: 24.0, f: 1.7, c: 0.0 },
             { id: 'f_kur', name: 'Куриная грудка отварная / запеченная', category: 'Мясо и птица', cal: 137, p: 29.8, f: 1.8, c: 0.4 },
+            { id: 'f_kur_b', name: 'Куриное бедро без кожи (запеченное)', category: 'Мясо и птица', cal: 185, p: 24.0, f: 9.5, c: 0.0 },
             { id: 'f_egg', name: 'Яйцо куриное (1 шт ≈ 55г)', category: 'Мясо и птица', cal: 157, p: 12.7, f: 11.5, c: 0.7 },
+            { id: 'f_oml', name: 'Омлет из 3 яиц с молоком', category: 'Мясо и птица', cal: 154, p: 11.0, f: 12.0, c: 1.5 },
             { id: 'f_gov', name: 'Говядина постная тушеная', category: 'Мясо и птица', cal: 187, p: 25.8, f: 9.0, c: 0.0 },
-            { id: 'f_rice', name: 'Рис отварной', category: 'Крупы и гарниры', cal: 116, p: 2.2, f: 0.5, c: 24.9 },
+            { id: 'f_svin', name: 'Свинина нежирная запеченная', category: 'Мясо и птица', cal: 242, p: 27.0, f: 14.0, c: 0.0 },
+
+            // Крупы, каши, гарниры и хлеб
+            { id: 'f_rice', name: 'Рис белый отварной', category: 'Крупы и гарниры', cal: 116, p: 2.2, f: 0.5, c: 24.9 },
+            { id: 'f_rice_b', name: 'Рис бурый отварной', category: 'Крупы и гарниры', cal: 123, p: 2.7, f: 1.0, c: 25.6 },
             { id: 'f_grech', name: 'Гречка отварная', category: 'Крупы и гарниры', cal: 110, p: 4.2, f: 1.1, c: 21.3 },
-            { id: 'f_ovs', name: 'Овсяная каша на молоке', category: 'Крупы и гарниры', cal: 102, p: 3.2, f: 4.0, c: 14.2 },
+            { id: 'f_ovs_m', name: 'Овсяная каша на молоке', category: 'Крупы и гарниры', cal: 102, p: 3.2, f: 4.0, c: 14.2 },
+            { id: 'f_ovs_w', name: 'Овсяная каша на воде', category: 'Крупы и гарниры', cal: 88, p: 3.0, f: 1.7, c: 15.0 },
+            { id: 'f_gerk', name: 'Овсяные хлопья Геркулес (сухие)', category: 'Крупы и гарниры', cal: 352, p: 12.5, f: 6.2, c: 61.8 },
+            { id: 'f_mann', name: 'Манная каша на молоке', category: 'Крупы и гарниры', cal: 98, p: 3.0, f: 2.8, c: 15.3 },
+            { id: 'f_pshen', name: 'Пшенная каша на молоке', category: 'Крупы и гарниры', cal: 115, p: 3.6, f: 3.3, c: 17.8 },
             { id: 'f_mak', name: 'Макароны из твердых сортов (отварные)', category: 'Крупы и гарниры', cal: 112, p: 3.6, f: 0.4, c: 23.2 },
+            { id: 'f_bulg', name: 'Булгур отварной', category: 'Крупы и гарниры', cal: 115, p: 3.5, f: 0.8, c: 23.0 },
             { id: 'f_kart', name: 'Картофель отварной / запеченный', category: 'Крупы и гарниры', cal: 82, p: 2.0, f: 0.4, c: 16.7 },
+            { id: 'f_pure', name: 'Картофельное пюре с молоком и маслом', category: 'Крупы и гарниры', cal: 106, p: 2.1, f: 4.2, c: 14.7 },
             { id: 'f_bread', name: 'Хлеб с отрубями', category: 'Крупы и гарниры', cal: 227, p: 7.5, f: 1.3, c: 45.2 },
+            { id: 'f_bread_w', name: 'Хлеб пшеничный / тостовый', category: 'Крупы и гарниры', cal: 265, p: 8.0, f: 3.2, c: 50.5 },
+
+            // Молочные продукты и шейки
             { id: 'f_shake', name: 'Калорийный шейк (творог, банан, молоко, паста, орехи)', category: 'Молочные', cal: 215, p: 9.8, f: 10.5, c: 20.4 },
-            { id: 'f_tvor', name: 'Творог 5%', category: 'Молочные', cal: 121, p: 17.2, f: 5.0, c: 1.8 },
-            { id: 'f_milk', name: 'Молоко 2.5%', category: 'Молочные', cal: 52, p: 2.8, f: 2.5, c: 4.7 },
-            { id: 'f_syr', name: 'Сыр твердый', category: 'Молочные', cal: 356, p: 24.0, f: 29.0, c: 0.0 },
+            { id: 'f_tvor5', name: 'Творог 5%', category: 'Молочные', cal: 121, p: 17.2, f: 5.0, c: 1.8 },
+            { id: 'f_tvor9', name: 'Творог 9%', category: 'Молочные', cal: 159, p: 16.0, f: 9.0, c: 2.0 },
+            { id: 'f_tvor0', name: 'Творог обезжиренный 0%', category: 'Молочные', cal: 71, p: 16.5, f: 0.2, c: 1.3 },
+            { id: 'f_milk25', name: 'Молоко 2.5%', category: 'Молочные', cal: 52, p: 2.8, f: 2.5, c: 4.7 },
+            { id: 'f_milk32', name: 'Молоко 3.2%', category: 'Молочные', cal: 60, p: 2.9, f: 3.2, c: 4.7 },
+            { id: 'f_kefir', name: 'Кефир 2.5%', category: 'Молочные', cal: 53, p: 3.0, f: 2.5, c: 4.0 },
+            { id: 'f_yog', name: 'Йогурт греческий натуральный', category: 'Молочные', cal: 66, p: 8.5, f: 2.0, c: 3.5 },
+            { id: 'f_syr', name: 'Сыр твердый (Российский / Гауда)', category: 'Молочные', cal: 356, p: 24.0, f: 29.0, c: 0.0 },
+            { id: 'f_syr_m', name: 'Моцарелла', category: 'Молочные', cal: 240, p: 18.0, f: 18.0, c: 1.0 },
+            { id: 'f_smet', name: 'Сметана 15%', category: 'Молочные', cal: 160, p: 2.6, f: 15.0, c: 3.6 },
+            { id: 'f_syrn', name: 'Сырники творожные', category: 'Молочные', cal: 220, p: 14.5, f: 9.5, c: 18.5 },
+
+            // Овощи и фрукты
             { id: 'f_ban', name: 'Банан', category: 'Овощи и фрукты', cal: 96, p: 1.5, f: 0.5, c: 21.0 },
             { id: 'f_ogur', name: 'Огурцы свежие', category: 'Овощи и фрукты', cal: 15, p: 0.8, f: 0.1, c: 2.8 },
             { id: 'f_pom', name: 'Помидоры свежие', category: 'Овощи и фрукты', cal: 20, p: 1.1, f: 0.2, c: 3.7 },
-            { id: 'f_pb', name: 'Арахисовая паста', category: 'Орехи и разное', cal: 588, p: 25.0, f: 50.0, c: 20.0 },
+            { id: 'f_yabl', name: 'Яблоко', category: 'Овощи и фрукты', cal: 47, p: 0.4, f: 0.4, c: 9.8 },
+            { id: 'f_grush', name: 'Груша', category: 'Овощи и фрукты', cal: 47, p: 0.4, f: 0.3, c: 10.3 },
+            { id: 'f_apel', name: 'Апельсин', category: 'Овощи и фрукты', cal: 43, p: 0.9, f: 0.2, c: 8.1 },
+            { id: 'f_mand', name: 'Мандарины', category: 'Овощи и фрукты', cal: 38, p: 0.8, f: 0.2, c: 7.5 },
+            { id: 'f_avok', name: 'Авокадо', category: 'Овощи и фрукты', cal: 160, p: 2.0, f: 14.7, c: 1.8 },
+            { id: 'f_brok', name: 'Брокколи на пару', category: 'Овощи и фрукты', cal: 34, p: 2.8, f: 0.4, c: 6.6 },
+            { id: 'f_kap', name: 'Капуста белокочанная / салат', category: 'Овощи и фрукты', cal: 28, p: 1.8, f: 0.2, c: 4.7 },
+            { id: 'f_per', name: 'Перец болгарский сладкий', category: 'Овощи и фрукты', cal: 27, p: 1.3, f: 0.1, c: 5.3 },
+
+            // Орехи, пасты, спортпит и масла
+            { id: 'f_pb', name: 'Арахисовая паста натуральная', category: 'Орехи и разное', cal: 588, p: 25.0, f: 50.0, c: 20.0 },
             { id: 'f_cashew', name: 'Кешью', category: 'Орехи и разное', cal: 553, p: 18.2, f: 43.8, c: 30.2 },
             { id: 'f_pean', name: 'Арахис жареный', category: 'Орехи и разное', cal: 567, p: 25.8, f: 49.2, c: 16.1 },
-            { id: 'f_gain', name: 'Гейнер (сухая смесь на 100г)', category: 'Орехи и разное', cal: 385, p: 20.0, f: 3.5, c: 68.0 },
+            { id: 'f_mind', name: 'Миндаль', category: 'Орехи и разное', cal: 579, p: 21.2, f: 49.9, c: 21.6 },
+            { id: 'f_grec_o', name: 'Орехи грецкие', category: 'Орехи и разное', cal: 654, p: 15.2, f: 65.2, c: 7.0 },
+            { id: 'f_gain', name: 'Гейнер углеводно-белковый (сухая смесь)', category: 'Орехи и разное', cal: 385, p: 20.0, f: 3.5, c: 68.0 },
+            { id: 'f_prot', name: 'Протеин сывороточный Whey (сухой)', category: 'Орехи и разное', cal: 390, p: 78.0, f: 5.5, c: 7.0 },
             { id: 'f_oil', name: 'Масло растительное / оливковое', category: 'Орехи и разное', cal: 898, p: 0.0, f: 99.8, c: 0.0 },
+            { id: 'f_butt', name: 'Масло сливочное 82.5%', category: 'Орехи и разное', cal: 748, p: 0.6, f: 82.5, c: 0.8 },
+            { id: 'f_choc', name: 'Шоколад темный / молочный', category: 'Орехи и разное', cal: 545, p: 6.5, f: 33.0, c: 55.0 },
+
+            // Рыба и морепродукты
             { id: 'f_los', name: 'Лосось / Семга', category: 'Рыба', cal: 202, p: 21.0, f: 13.0, c: 0.0 },
-            { id: 'f_tun', name: 'Тунец в собственном соку', category: 'Рыба', cal: 101, p: 23.0, f: 0.8, c: 0.0 }
+            { id: 'f_tun', name: 'Тунец в собственном соку', category: 'Рыба', cal: 101, p: 23.0, f: 0.8, c: 0.0 },
+            { id: 'f_mint', name: 'Минтай / Треска на пару', category: 'Рыба', cal: 79, p: 17.6, f: 0.9, c: 0.0 },
+            { id: 'f_krev', name: 'Креветки отварные', category: 'Рыба', cal: 95, p: 20.5, f: 1.2, c: 0.0 }
         ];
 
         const CATEGORIES = ['Все', 'Мясо и птица', 'Крупы и гарниры', 'Молочные', 'Овощи и фрукты', 'Орехи и разное', 'Рыба', 'Мои продукты'];
@@ -688,7 +734,7 @@
 
         let state = {
             profile: { gender: 'male', age: 25, height: 198, weight: 72, activity: 1.55, goal: 'gain', customCalories: 3300 },
-            targets: { bmr: 0, tdee: 0, calories: 3300, protein: 0, fat: 0, carbs: 0, water: 2.4 },
+            targets: { bmr: 0, tdee: 0, calories: 3300, protein: 0, fat: 0, carbs: 0, water: 2.5 },
             currentMealTab: 'breakfast',
             selectedCategory: 'Все',
             selectedFoodId: 'f_kotl',
@@ -698,6 +744,14 @@
             yesterdayDate: null,
             lastActiveDate: new Date().toLocaleDateString('ru-RU')
         };
+
+        // Временный кэш результатов Open Food Facts для безопасного клика без поломок кавычек
+        let openFoodSearchTimeout = null;
+        let lastOffResults = [];
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
 
         function saveStateToStorage() {
             try {
@@ -738,7 +792,6 @@
                     }
                     state.yesterdayDate = parsed.yesterdayDate || null;
 
-                    // Автоматический перенос при смене суток
                     if (parsed.lastActiveDate && parsed.lastActiveDate !== todayStr) {
                         const hasFoodToday = ['breakfast','lunch','dinner','snack'].some(k => state.meals[k].length > 0);
                         if (hasFoodToday) {
@@ -750,7 +803,7 @@
                     state.lastActiveDate = todayStr;
                 }
             } catch(e) {
-                console.error('Ошибка чтения памяти, сброс к стандарту', e);
+                console.error('Ошибка чтения памяти', e);
             }
         }
 
@@ -797,7 +850,6 @@
             if (def) window.selectFoodItem(def.id, false);
         }
 
-        // Глобальные функции управления профилем
         window.setGender = function(g) {
             state.profile.gender = g;
             calculateTargets();
@@ -949,25 +1001,124 @@
             document.getElementById('food-dropdown').classList.remove('hidden');
         };
 
-        window.filterFoodDropdown = function() {
-            const q = document.getElementById('food-search-input').value.trim().toLowerCase();
-            const selectedFood = getFoodById(state.selectedFoodId);
-            const searchQuery = (selectedFood && selectedFood.name.toLowerCase() === q) ? '' : q;
+        function renderLocalFoodItemsHtml(localList) {
+            return localList.map(f => `
+                <div onclick="window.selectFoodItem('${f.id}', true)" class="px-3.5 py-2.5 cursor-pointer hover:bg-emerald-50 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-slate-800">${escapeHtml(f.name)}</strong>
+                        <div class="text-[11px] text-slate-400">${escapeHtml(f.category)} • Б:${f.p} Ж:${f.f} У:${f.c}</div>
+                    </div>
+                    <div class="font-bold text-emerald-700 shrink-0 ml-2">${f.cal} ккал</div>
+                </div>
+            `).join('');
+        }
 
-            const filtered = getAllFoods().filter(f =>
+        // Поиск: локальная база + мировая база Open Food Facts
+        window.filterFoodDropdown = function() {
+            const rawQ = document.getElementById('food-search-input').value.trim().toLowerCase();
+            const dropdown = document.getElementById('food-dropdown');
+            const selectedFood = getFoodById(state.selectedFoodId);
+            
+            // Если в поле просто стоит имя уже выбранного продукта, показываем весь список категории
+            const isUnchangedSelected = selectedFood && selectedFood.name.toLowerCase() === rawQ;
+            const searchQuery = isUnchangedSelected ? '' : rawQ;
+
+            const localFiltered = getAllFoods().filter(f =>
                 (state.selectedCategory === 'Все' || f.category === state.selectedCategory) &&
                 (!searchQuery || f.name.toLowerCase().includes(searchQuery))
             );
 
-            document.getElementById('food-dropdown').innerHTML = filtered.length ? filtered.map(f => `
-                <div onclick="window.selectFoodItem('${f.id}', true)" class="px-3.5 py-2.5 cursor-pointer hover:bg-emerald-50 flex items-center justify-between text-xs">
-                    <div>
-                        <strong class="text-slate-800">${f.name}</strong>
-                        <div class="text-[11px] text-slate-400">${f.category} • Б:${f.p} Ж:${f.f} У:${f.c}</div>
+            let html = renderLocalFoodItemsHtml(localFiltered);
+
+            if (searchQuery.length >= 2) {
+                html += `
+                    <div id="off-status" class="p-3 text-xs text-indigo-600 text-center bg-indigo-50/50 font-medium">
+                        🌎 Ищем «${escapeHtml(searchQuery)}» в базе Open Food Facts...
                     </div>
-                    <div class="font-bold text-emerald-700 shrink-0 ml-2">${f.cal} ккал</div>
-                </div>
-            `).join('') : '<div class="p-3 text-xs text-slate-400 text-center">Продукт не найден</div>';
+                `;
+                dropdown.innerHTML = html;
+                dropdown.classList.remove('hidden');
+
+                clearTimeout(openFoodSearchTimeout);
+                openFoodSearchTimeout = setTimeout(async () => {
+                    try {
+                        const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(searchQuery)}&search_simple=1&action=process&json=1&page_size=12`;
+                        const res = await fetch(url);
+                        const data = await res.json();
+
+                        const validProducts = (data.products || []).filter(p => {
+                            const hasName = p.product_name_ru || p.product_name;
+                            const n = p.nutriments;
+                            return hasName && n && (n['energy-kcal_100g'] !== undefined || n['energy_100g'] !== undefined);
+                        });
+
+                        lastOffResults = validProducts.map((p, idx) => {
+                            const rawName = p.product_name_ru || p.product_name || 'Продукт';
+                            const brand = p.brands ? p.brands.split(',')[0].trim() : '';
+                            const fullName = brand && !rawName.toLowerCase().includes(brand.toLowerCase())
+                                ? `${rawName} (${brand})`
+                                : rawName;
+                            const n = p.nutriments || {};
+                            const cal = Math.round(n['energy-kcal_100g'] !== undefined ? n['energy-kcal_100g'] : (n['energy_100g'] / 4.184) || 0);
+                            const prot = +(n['proteins_100g'] || 0).toFixed(1);
+                            const fat = +(n['fat_100g'] || 0).toFixed(1);
+                            const carb = +(n['carbohydrates_100g'] || 0).toFixed(1);
+                            return {
+                                id: 'off_' + (p.code || Date.now() + '_' + idx),
+                                name: fullName,
+                                cal, p: prot, f: fat, c: carb
+                            };
+                        });
+
+                        let updatedHtml = renderLocalFoodItemsHtml(localFiltered);
+
+                        if (lastOffResults.length > 0) {
+                            updatedHtml += `<div class="bg-indigo-50 px-3.5 py-1.5 text-[10px] font-bold text-indigo-700 uppercase tracking-wider">🌎 Найдено в Open Food Facts (нажмите, чтобы добавить)</div>`;
+                            updatedHtml += lastOffResults.map((item, idx) => `
+                                <div onclick="window.selectOpenFoodResult(${idx})" class="px-3.5 py-2.5 cursor-pointer hover:bg-indigo-50/70 flex items-center justify-between text-xs border-t border-slate-100">
+                                    <div class="pr-2">
+                                        <strong class="text-indigo-950">${escapeHtml(item.name)}</strong>
+                                        <div class="text-[11px] text-slate-400">🌎 Мировая база • Б:${item.p} Ж:${item.f} У:${item.c}</div>
+                                    </div>
+                                    <div class="font-bold text-indigo-600 shrink-0">${item.cal} ккал</div>
+                                </div>
+                            `).join('');
+                        } else if (localFiltered.length === 0) {
+                            updatedHtml = '<div class="p-4 text-xs text-slate-400 text-center">Ничего не найдено. Вы можете добавить продукт вручную через «Свой продукт».</div>';
+                        }
+
+                        dropdown.innerHTML = updatedHtml;
+                    } catch (err) {
+                        const statusEl = document.getElementById('off-status');
+                        if (statusEl) statusEl.textContent = 'Локальные результаты (онлайн-база временно недоступна)';
+                    }
+                }, 400);
+            } else {
+                clearTimeout(openFoodSearchTimeout);
+                dropdown.innerHTML = html || '<div class="p-3 text-xs text-slate-400 text-center">В этой категории пока пусто</div>';
+            }
+        };
+
+        window.selectOpenFoodResult = function(index) {
+            const item = lastOffResults[index];
+            if (!item) return;
+            let existing = state.customFoods.find(f => f.id === item.id || f.name.toLowerCase() === item.name.toLowerCase());
+            if (!existing) {
+                existing = {
+                    id: item.id,
+                    name: item.name,
+                    category: 'Мои продукты',
+                    cal: item.cal,
+                    p: item.p,
+                    f: item.f,
+                    c: item.c
+                };
+                state.customFoods.unshift(existing);
+                saveStateToStorage();
+                document.getElementById('custom-count-badge').textContent = `${state.customFoods.length} своих`;
+            }
+            window.selectFoodItem(existing.id, true);
+            showToast('Загружено из Open Food Facts!');
         };
 
         window.selectFoodItem = function(id, close = true) {
@@ -1064,7 +1215,7 @@
                 return `
                     <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs">
                         <div class="pr-2">
-                            <strong class="text-slate-800">${f.name}</strong>
+                            <strong class="text-slate-800">${escapeHtml(f.name)}</strong>
                             <div class="text-[11px] text-slate-400 mt-0.5">Б: ${(f.p*r).toFixed(1)}г • Ж: ${(f.f*r).toFixed(1)}г • У: ${(f.c*r).toFixed(1)}г</div>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
@@ -1077,7 +1228,6 @@
             }).join('');
         }
 
-        // Логика и рендер блока «Что я ел вчера»
         function renderYesterdaySection() {
             const yTotals = calculateDayTotals(state.yesterdayMeals);
             document.getElementById('yesterday-total-badge').textContent = `${yTotals.cal} ккал (Б:${yTotals.p} Ж:${yTotals.f} У:${yTotals.c})`;
@@ -1109,8 +1259,8 @@
             container.innerHTML = allYItems.map(item => `
                 <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
                     <div>
-                        <span class="text-[10px] font-bold uppercase text-indigo-600 mr-1.5">${item.mealTitle}</span>
-                        <strong class="text-slate-700">${item.name}</strong>
+                        <span class="text-[10px] font-bold uppercase text-indigo-600 mr-1.5">${escapeHtml(item.mealTitle)}</span>
+                        <strong class="text-slate-700">${escapeHtml(item.name)}</strong>
                     </div>
                     <div class="shrink-0 ml-2 text-slate-600">
                         ${item.weight} г — <strong class="text-indigo-700">${item.cal} ккал</strong>
@@ -1129,7 +1279,7 @@
             state.yesterdayDate = new Date().toLocaleDateString('ru-RU');
             saveStateToStorage();
             renderAll();
-            showToast('Сегодняшний рацион сохранен в блок «Вчера»!');
+            showToast('Сохранено в блок «Вчера»!');
         };
 
         window.copyYesterdayToToday = function() {
@@ -1163,7 +1313,6 @@
             }).join('');
         }
 
-        // Модалки
         window.openCustomFoodModal = function() {
             document.getElementById('custom-food-modal').classList.remove('hidden');
             document.getElementById('custom-food-modal').classList.add('flex');
@@ -1197,7 +1346,7 @@
         window.loadDemoDay = function() {
             state.meals = {
                 breakfast: [
-                    { uid: 'd1', foodId: 'f_ovs', weight: 300 },
+                    { uid: 'd1', foodId: 'f_ovs_m', weight: 300 },
                     { uid: 'd2', foodId: 'f_egg', weight: 165 },
                     { uid: 'd3', foodId: 'f_bread', weight: 60 }
                 ],
@@ -1217,7 +1366,7 @@
             };
             saveStateToStorage();
             renderAll();
-            showToast('Загружен мощный рацион!');
+            showToast('Загружен пример рациона!');
         };
 
         window.openResetModal = function() {
@@ -1248,7 +1397,7 @@
             if (el) el.scrollIntoView({ behavior: 'smooth' });
         };
 
-        // ИИ-Сканер
+        // ИИ-Сканер с моделью gemini-3.5-flash-lite
         let currentScanBase64 = null, lastAiRecognizedFood = null;
 
         window.saveApiKey = function(val) {
@@ -1303,7 +1452,7 @@
             errBox.classList.add('hidden');
 
             if (!apiKey) {
-                errBox.innerHTML = 'Для работы ИИ-сканера на GitHub Pages укажите ваш бесплатный ключ Gemini API в поле выше (кнопка «Получить бесплатно»).';
+                errBox.innerHTML = 'Укажите ваш ключ Gemini API в поле выше.';
                 errBox.classList.remove('hidden');
                 return;
             }
@@ -1339,7 +1488,7 @@
                 window.recalcAiResultPortion();
                 document.getElementById('ai-result-card').classList.remove('hidden');
             } catch(e) {
-                errBox.textContent = 'Ошибка распознавания: проверьте правильность API-ключа или интернет-соединение.';
+                errBox.textContent = 'Ошибка распознавания: ' + (e.message || 'проверьте ключ или интернет');
                 errBox.classList.remove('hidden');
             } finally {
                 document.getElementById('ai-loading-overlay').classList.add('hidden');
@@ -1383,7 +1532,6 @@
             showToast('Блюдо добавлено в рацион!');
         };
 
-        // Инициализация при загрузке
         window.addEventListener('DOMContentLoaded', () => {
             loadStateFromStorage();
             calculateTargets();
