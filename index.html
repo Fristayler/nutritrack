@@ -44,7 +44,7 @@
                         <span>NutriTrack</span>
                         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-600 text-white rounded-full">PRO</span>
                     </h1>
-                    <p class="text-xs text-slate-500 hidden md:block">Калькулятор рациона, база Open Food Facts и ИИ-сканер</p>
+                    <p class="text-xs text-slate-500 hidden md:block">Калькулятор рациона, быстрый поиск Open Food Facts и ИИ-сканер</p>
                 </div>
             </div>
             
@@ -366,7 +366,7 @@
                                 <div class="sm:col-span-7 relative" id="search-container">
                                     <div class="relative">
                                         <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base"></i>
-                                        <input type="text" id="food-search-input" placeholder="Поиск (локально + Open Food Facts)..." autocomplete="off"
+                                        <input type="text" id="food-search-input" placeholder="Поиск (локально + Open Food Facts + ИИ)..." autocomplete="off"
                                             onfocus="window.showFoodDropdown()" oninput="window.filterFoodDropdown()"
                                             class="w-full bg-white border border-slate-200 focus:border-emerald-500 rounded-xl pl-10 pr-8 py-2.5 text-sm text-slate-800 outline-none">
                                         <button type="button" id="clear-search-btn" onclick="window.clearSelectedFood()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
@@ -745,7 +745,6 @@
             lastActiveDate: new Date().toLocaleDateString('ru-RU')
         };
 
-        // Временный кэш результатов Open Food Facts для безопасного клика без поломок кавычек
         let openFoodSearchTimeout = null;
         let lastOffResults = [];
 
@@ -1013,13 +1012,51 @@
             `).join('');
         }
 
-        // Поиск: локальная база + мировая база Open Food Facts
+        // Каскадная функция запроса к Open Food Facts (Прямой быстрый API -> Прокси без VPN)
+        async function fetchOpenFoodFactsFast(query) {
+            const fields = 'code,product_name,product_name_ru,brands,nutriments';
+            const fastUrl = `https://search.openfoodfacts.org/search?q=${encodeURIComponent(query)}&page_size=12&fields=${fields}`;
+            const ruApiUrl = `https://ru.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=12&fields=${fields}`;
+
+            const fetchWithTimeout = async (url, ms = 2500) => {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), ms);
+                try {
+                    const res = await fetch(url, { signal: controller.signal });
+                    clearTimeout(timer);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return await res.json();
+                } catch (err) {
+                    clearTimeout(timer);
+                    throw err;
+                }
+            };
+
+            // Попытка 1: Сверхбыстрый поиск напрямую
+            try {
+                const data = await fetchWithTimeout(fastUrl, 2200);
+                if (data && Array.isArray(data.hits)) return data.hits;
+            } catch (e) {}
+
+            // Попытка 2: Через облачный прокси (обходит блокировки провайдеров без VPN)
+            try {
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fastUrl)}`;
+                const data = await fetchWithTimeout(proxyUrl, 3500);
+                if (data && Array.isArray(data.hits)) return data.hits;
+            } catch (e) {}
+
+            // Попытка 3: Запасной прокси к базе РФ
+            const backupProxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(ruApiUrl)}`;
+            const backupData = await fetchWithTimeout(backupProxy, 4000);
+            return (backupData && backupData.products) ? backupData.products : [];
+        }
+
+        // Поиск: локальная база + быстрый Open Food Facts без VPN + ИИ-поиск по тексту
         window.filterFoodDropdown = function() {
             const rawQ = document.getElementById('food-search-input').value.trim().toLowerCase();
             const dropdown = document.getElementById('food-dropdown');
             const selectedFood = getFoodById(state.selectedFoodId);
             
-            // Если в поле просто стоит имя уже выбранного продукта, показываем весь список категории
             const isUnchangedSelected = selectedFood && selectedFood.name.toLowerCase() === rawQ;
             const searchQuery = isUnchangedSelected ? '' : rawQ;
 
@@ -1032,8 +1069,8 @@
 
             if (searchQuery.length >= 2) {
                 html += `
-                    <div id="off-status" class="p-3 text-xs text-indigo-600 text-center bg-indigo-50/50 font-medium">
-                        🌎 Ищем «${escapeHtml(searchQuery)}» в базе Open Food Facts...
+                    <div id="off-status" class="p-3 text-xs text-indigo-600 text-center bg-indigo-50/60 font-medium flex items-center justify-center gap-2">
+                        <span>⚡ Быстрый поиск «${escapeHtml(searchQuery)}» в Open Food Facts...</span>
                     </div>
                 `;
                 dropdown.innerHTML = html;
@@ -1042,11 +1079,9 @@
                 clearTimeout(openFoodSearchTimeout);
                 openFoodSearchTimeout = setTimeout(async () => {
                     try {
-                        const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(searchQuery)}&search_simple=1&action=process&json=1&page_size=12`;
-                        const res = await fetch(url);
-                        const data = await res.json();
+                        const rawProducts = await fetchOpenFoodFactsFast(searchQuery);
 
-                        const validProducts = (data.products || []).filter(p => {
+                        const validProducts = (rawProducts || []).filter(p => {
                             const hasName = p.product_name_ru || p.product_name;
                             const n = p.nutriments;
                             return hasName && n && (n['energy-kcal_100g'] !== undefined || n['energy_100g'] !== undefined);
@@ -1054,12 +1089,12 @@
 
                         lastOffResults = validProducts.map((p, idx) => {
                             const rawName = p.product_name_ru || p.product_name || 'Продукт';
-                            const brand = p.brands ? p.brands.split(',')[0].trim() : '';
+                            const brand = Array.isArray(p.brands) ? p.brands[0] : (p.brands ? p.brands.split(',')[0].trim() : '');
                             const fullName = brand && !rawName.toLowerCase().includes(brand.toLowerCase())
                                 ? `${rawName} (${brand})`
                                 : rawName;
                             const n = p.nutriments || {};
-                            const cal = Math.round(n['energy-kcal_100g'] !== undefined ? n['energy-kcal_100g'] : (n['energy_100g'] / 4.184) || 0);
+                            const cal = Math.round(n['energy-kcal_100g'] !== undefined ? n['energy-kcal_100g'] : ((n['energy_100g'] || 0) / 4.184));
                             const prot = +(n['proteins_100g'] || 0).toFixed(1);
                             const fat = +(n['fat_100g'] || 0).toFixed(1);
                             const carb = +(n['carbohydrates_100g'] || 0).toFixed(1);
@@ -1072,30 +1107,87 @@
 
                         let updatedHtml = renderLocalFoodItemsHtml(localFiltered);
 
+                        // Кнопка мгновенного расчета продукта через Gemini, если нужной марки нет
+                        updatedHtml += `
+                            <div onclick="window.askAiForFoodText('${escapeHtml(searchQuery)}')" class="px-3.5 py-2 cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center justify-between border-y border-emerald-200/60">
+                                <span>✨ Найти точное КБЖУ «${escapeHtml(searchQuery)}» через ИИ</span>
+                                <span class="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-md">Gemini</span>
+                            </div>
+                        `;
+
                         if (lastOffResults.length > 0) {
-                            updatedHtml += `<div class="bg-indigo-50 px-3.5 py-1.5 text-[10px] font-bold text-indigo-700 uppercase tracking-wider">🌎 Найдено в Open Food Facts (нажмите, чтобы добавить)</div>`;
+                            updatedHtml += `<div class="bg-indigo-50 px-3.5 py-1.5 text-[10px] font-bold text-indigo-700 uppercase tracking-wider">🌎 Open Food Facts (нажмите для выбора)</div>`;
                             updatedHtml += lastOffResults.map((item, idx) => `
                                 <div onclick="window.selectOpenFoodResult(${idx})" class="px-3.5 py-2.5 cursor-pointer hover:bg-indigo-50/70 flex items-center justify-between text-xs border-t border-slate-100">
                                     <div class="pr-2">
                                         <strong class="text-indigo-950">${escapeHtml(item.name)}</strong>
-                                        <div class="text-[11px] text-slate-400">🌎 Мировая база • Б:${item.p} Ж:${item.f} У:${item.c}</div>
+                                        <div class="text-[11px] text-slate-400">🌎 База OFF • Б:${item.p} Ж:${item.f} У:${item.c}</div>
                                     </div>
                                     <div class="font-bold text-indigo-600 shrink-0">${item.cal} ккал</div>
                                 </div>
                             `).join('');
-                        } else if (localFiltered.length === 0) {
-                            updatedHtml = '<div class="p-4 text-xs text-slate-400 text-center">Ничего не найдено. Вы можете добавить продукт вручную через «Свой продукт».</div>';
+                        } else {
+                            updatedHtml += '<div class="p-3 text-xs text-slate-400 text-center">В каталоге Open Food Facts не найдено — нажмите зеленую кнопку выше для расчета через ИИ!</div>';
                         }
 
                         dropdown.innerHTML = updatedHtml;
                     } catch (err) {
-                        const statusEl = document.getElementById('off-status');
-                        if (statusEl) statusEl.textContent = 'Локальные результаты (онлайн-база временно недоступна)';
+                        let fallbackHtml = renderLocalFoodItemsHtml(localFiltered);
+                        fallbackHtml += `
+                            <div onclick="window.askAiForFoodText('${escapeHtml(searchQuery)}')" class="px-3.5 py-2.5 cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center justify-between">
+                                <span>✨ Рассчитать КБЖУ «${escapeHtml(searchQuery)}» через ИИ</span>
+                                <span class="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-md">Запрос</span>
+                            </div>
+                        `;
+                        dropdown.innerHTML = fallbackHtml;
                     }
-                }, 400);
+                }, 250);
             } else {
                 clearTimeout(openFoodSearchTimeout);
                 dropdown.innerHTML = html || '<div class="p-3 text-xs text-slate-400 text-center">В этой категории пока пусто</div>';
+            }
+        };
+
+        // Поиск КБЖУ любого продукта по названию через ваш ключ Gemini
+        window.askAiForFoodText = async function(queryText) {
+            const apiKey = (localStorage.getItem('nutritrack_gemini_key') || '').trim();
+            if (!apiKey) {
+                showToast('Сначала укажите ключ Gemini API в окне ИИ-Сканера');
+                window.openAiScannerModal();
+                return;
+            }
+            const dropdown = document.getElementById('food-dropdown');
+            dropdown.innerHTML = `<div class="p-4 text-xs text-emerald-700 font-semibold text-center">✨ Gemini определяет точное КБЖУ для «${escapeHtml(queryText)}»...</div>`;
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
+                const prompt = `Укажи точное справочное КБЖУ на 100 грамм для продукта или блюда: "${queryText}" на русском языке. Верни строго JSON объект с полями: name (строка с красивым названием), cal (число ккал на 100г), p (белки на 100г), f (жиры на 100г), c (углеводы на 100г).`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+                const json = await res.json();
+                const data = JSON.parse(json.candidates[0].content.parts[0].text);
+                const newFood = {
+                    id: 'ai_txt_' + Date.now(),
+                    name: `✨ ${data.name || queryText}`,
+                    category: 'Мои продукты',
+                    cal: Math.round(data.cal || 100),
+                    p: +(data.p || 0).toFixed(1),
+                    f: +(data.f || 0).toFixed(1),
+                    c: +(data.c || 0).toFixed(1)
+                };
+                state.customFoods.unshift(newFood);
+                saveStateToStorage();
+                renderAll();
+                window.selectFoodItem(newFood.id, true);
+                showToast(`Найдено: ${newFood.name}`);
+            } catch (e) {
+                showToast('Не удалось запросить ИИ, проверьте ключ');
+                dropdown.classList.add('hidden');
             }
         };
 
