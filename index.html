@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+77<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -1310,7 +1310,7 @@
 
             document.getElementById('ai-loading-overlay').classList.remove('hidden');
             const hint = document.getElementById('ai-user-hint').value.trim();
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
             const prompt = `Определи блюдо на фото на русском языке. ${hint ? 'Уточнение пользователя: ' + hint : ''}. Верни строго JSON с полями: dishName (строка), estimatedPortionGrams (число), caloriesPer100g (число), proteinPer100g (число), fatPer100g (число), carbsPer100g (число).`;
 
             try {
